@@ -18,13 +18,8 @@ public class BulkUploadController {
     private BulkUploadService bulkUploadService;
 
     @PostMapping("/bulk-upload/vehicles")
-    public UploadSummaryDTO
-    uploadVehiclesCSV(
+    public UploadSummaryDTO uploadVehiclesCSV( @RequestParam("file") MultipartFile file) {
 
-            @RequestParam("file")
-            MultipartFile file) {
-
-        return bulkUploadService
-                .uploadVehicleVariants(file);
+        return bulkUploadService .uploadVehicleVariants(file);
     }
 }
