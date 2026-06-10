@@ -1,0 +1,23 @@
+# Gradle build outputs
+build/
+bin/
+out/
+
+# Gradle cache
+.gradle/
+
+# Compiled artifacts
+*.jar
+*.war
+*.class
+
+# Eclipse / IntelliJ
+.classpath
+.project
+.settings/
+*.iml
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
