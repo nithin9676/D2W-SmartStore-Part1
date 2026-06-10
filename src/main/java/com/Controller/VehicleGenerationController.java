@@ -17,11 +17,7 @@ public class VehicleGenerationController {
     private VehicleGenerationService
             vehicleGenerationService;
 
-    /*
-    |--------------------------------------------------------------------------
-    | INSERT GENERATION
-    |--------------------------------------------------------------------------
-    */
+   
 
     @PostMapping
     public String insertVehicleGeneration(
@@ -34,11 +30,7 @@ public class VehicleGenerationController {
                 );
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | GET GENERATIONS BY MODEL
-    |--------------------------------------------------------------------------
-    */
+   
 
     @GetMapping("/by-model/{modelId}")
     public List<VehicleGeneration>
@@ -52,11 +44,7 @@ public class VehicleGenerationController {
                 );
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | GET ALL GENERATIONS
-    |--------------------------------------------------------------------------
-    */
+ 
 
     @GetMapping
     public List<VehicleGeneration>

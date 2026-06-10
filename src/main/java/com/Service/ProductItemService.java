@@ -13,15 +13,20 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.DTO.ProductDetailResponseDTO;
 import com.DTO.ProductSearchResponseDTO;
+import com.DTO.VehicleCompatibilityDTO;
 import com.Entity.ProductBrand;
 import com.Entity.ProductFitment;
 import com.Entity.ProductItem;
 import com.Entity.ProductMaster;
+import com.Entity.Store;
+import com.Entity.StoreInventory;
 import com.Entity.VehicleVariant;
 import com.Repostory.ProductBrandRepository;
 import com.Repostory.ProductFitmentRepository;
 import com.Repostory.ProductItemRepository;
 import com.Repostory.ProductMasterRepository;
+import com.Repostory.StoreInventoryRepository;
+import com.Repostory.StoreRepository;
 import com.enumclasses.ApprovalStatus;
 import com.enumclasses.FittingPosition;
 import com.enumclasses.OriginType;
@@ -41,6 +46,10 @@ public class ProductItemService {
 
     @Autowired
     private ProductFitmentRepository productFitmentRepository;
+    @Autowired
+    private StoreInventoryRepository storeInventoryRepository;
+    @Autowired
+    private StoreRepository storeRepository;
 
     public String insertProductItemDetails(ProductItem productItem) {
 
@@ -138,9 +147,7 @@ public class ProductItemService {
 
             String line;
 
-            /*
-             * Skip CSV Header
-             */
+           
             reader.readLine();
 
             while ((line = reader.readLine()) != null) {
@@ -160,20 +167,14 @@ public class ProductItemService {
                     String[] data =
                             line.split(",");
 
-                    /*
-                     * Expected Columns = 28
-                     */
+                   
                     if (data.length < 28) {
 
                         skipped++;
                         continue;
                     }
 
-                    /*
-                     * =========================
-                     * BASIC INFO
-                     * =========================
-                     */
+                  
 
                     String itemName =
                             data[0].trim();
@@ -199,11 +200,7 @@ public class ProductItemService {
                     String sku =
                             data[7].trim();
 
-                    /*
-                     * =========================
-                     * RELATIONSHIP DATA
-                     * =========================
-                     */
+                   
 
                     String masterName =
                             data[8].trim();
@@ -211,11 +208,7 @@ public class ProductItemService {
                     String brandName =
                             data[9].trim();
 
-                    /*
-                     * =========================
-                     * PRICING
-                     * =========================
-                     */
+                  
 
                     BigDecimal mrpPrice =
                             new BigDecimal(
@@ -237,11 +230,7 @@ public class ProductItemService {
                             new BigDecimal(
                                     data[14].trim());
 
-                    /*
-                     * =========================
-                     * INVENTORY
-                     * =========================
-                     */
+                   
 
                     Integer stockQuantity =
                             Integer.parseInt(
@@ -251,31 +240,18 @@ public class ProductItemService {
                             StockStatus.valueOf(
                                     data[16].trim());
 
-                    /*
-                     * =========================
-                     * APPROVAL
-                     * =========================
-                     */
+                    
 
                     ApprovalStatus approvalStatus =
                             ApprovalStatus.valueOf(
                                     data[17].trim());
 
-                    /*
-                     * =========================
-                     * ORIGIN
-                     * =========================
-                     */
-
+                   
                     OriginType originType =
                             OriginType.valueOf(
                                     data[18].trim());
 
-                    /*
-                     * =========================
-                     * IMAGES
-                     * =========================
-                     */
+                  
 
                     String mainImageUrl =
                             data[19].trim();
@@ -286,11 +262,7 @@ public class ProductItemService {
                     String thirdImageUrl =
                             data[21].trim();
 
-                    /*
-                     * =========================
-                     * MANUFACTURER
-                     * =========================
-                     */
+                 
 
                     String manufacturer =
                             data[22].trim();
@@ -298,21 +270,13 @@ public class ProductItemService {
                     String countryOfOrigin =
                             data[23].trim();
 
-                    /*
-                     * =========================
-                     * FITTING POSITION
-                     * =========================
-                     */
+                  
 
                     FittingPosition fittingPosition =
                             FittingPosition.valueOf(
                                     data[24].trim());
 
-                    /*
-                     * =========================
-                     * SEO
-                     * =========================
-                     */
+                  
 
                     String metaTitle =
                             data[25].trim();
@@ -320,22 +284,13 @@ public class ProductItemService {
                     String metaDescription =
                             data[26].trim();
 
-                    /*
-                     * =========================
-                     * STATUS
-                     * =========================
-                     */
+                   
 
                     Boolean isActive =
                             Boolean.parseBoolean(
                                     data[27].trim());
 
-                    /*
-                     * =========================
-                     * VALIDATION
-                     * =========================
-                     */
-
+                   
                     if (
                             itemName.isBlank()
                             || slug.isBlank()
@@ -349,11 +304,7 @@ public class ProductItemService {
                         continue;
                     }
 
-                    /*
-                     * =========================
-                     * FIND PRODUCT MASTER
-                     * =========================
-                     */
+                  
 
                     Optional<ProductMaster>
                             masterOptional =
@@ -367,11 +318,7 @@ public class ProductItemService {
                         continue;
                     }
 
-                    /*
-                     * =========================
-                     * FIND PRODUCT BRAND
-                     * =========================
-                     */
+                  
 
                     Optional<ProductBrand>
                             brandOptional =
@@ -385,11 +332,7 @@ public class ProductItemService {
                         continue;
                     }
 
-                    /*
-                     * =========================
-                     * DUPLICATE CHECK
-                     * =========================
-                     */
+                 
 
                     Optional<ProductItem>
                             existingProduct =
@@ -403,11 +346,7 @@ public class ProductItemService {
                         continue;
                     }
 
-                    /*
-                     * =========================
-                     * CREATE PRODUCT ITEM
-                     * =========================
-                     */
+                  
 
                     ProductItem productItem =
                             new ProductItem();
@@ -496,11 +435,7 @@ public class ProductItemService {
                     productItem.setIsActive(
                             isActive);
 
-                    /*
-                     * =========================
-                     * SAVE
-                     * =========================
-                     */
+                   
 
                     productItemRepository
                             .save(productItem);
@@ -529,51 +464,140 @@ public class ProductItemService {
                 + skipped;
     }
 
-    public List<ProductSearchResponseDTO> getProductBySearchText(String text) {
+    public List<ProductSearchResponseDTO> getProductBySearchText(
+            String text,
+            Long storeId) {
 
-        List<ProductSearchResponseDTO> result = new ArrayList<>();
+        List<ProductSearchResponseDTO> result =
+                new ArrayList<>();
 
         List<ProductItem> allProducts;
 
         if(text == null || text.trim().isBlank()) {
 
-            allProducts = productItemRepository.findAll();
+            allProducts =
+                    productItemRepository.findAll();
 
         } else {
 
-            allProducts = productItemRepository.globalSearchProducts(text.trim());
+            allProducts =
+                    productItemRepository
+                            .globalSearchProducts(
+                                    text.trim()
+                            );
+        }
+
+        Store store = null;
+
+        if(storeId != null) {
+
+            store =
+                    storeRepository
+                            .findById(storeId)
+                            .orElse(null);
         }
 
         for(ProductItem productItem : allProducts) {
 
-            ProductSearchResponseDTO dto = new ProductSearchResponseDTO();
+            ProductSearchResponseDTO dto =
+                    new ProductSearchResponseDTO();
 
-            dto.setId(productItem.getId());
+            dto.setId(
+                    productItem.getId()
+            );
 
-            dto.setItemName(productItem.getItemName());
+            dto.setItemName(
+                    productItem.getItemName()
+            );
 
-            dto.setSlug(productItem.getSlug());
+            dto.setSlug(
+                    productItem.getSlug()
+            );
 
-            dto.setPartNumber(productItem.getPartNumber());
+            dto.setPartNumber(
+                    productItem.getPartNumber()
+            );
 
-            dto.setBrandName(productItem.getPartBrand().getBrandName());
+            dto.setBrandName(
+                    productItem
+                            .getPartBrand()
+                            .getBrandName()
+            );
 
-            dto.setCategoryName(productItem.getPartMaster().getCategory().getCategoryName());
+            dto.setCategoryName(
+                    productItem
+                            .getPartMaster()
+                            .getCategory()
+                            .getCategoryName()
+            );
 
-            dto.setPartName(productItem.getPartMaster().getMasterName());
+            dto.setPartName(
+                    productItem
+                            .getPartMaster()
+                            .getMasterName()
+            );
 
-            dto.setMainImageUrl(productItem.getMainImageUrl());
+            dto.setMainImageUrl(
+                    productItem.getMainImageUrl()
+            );
 
-            dto.setSellingPrice(productItem.getSellingPrice());
+            dto.setSellingPrice(
+                    productItem.getSellingPrice()
+            );
 
-            dto.setInStock(productItem.getStockQuantity() != null && productItem.getStockQuantity() > 0);
+            Integer storeQuantity = 0;
+
+            Boolean availableInStore = false;
+
+            if(store != null) {
+
+                StoreInventory inventory =
+                        storeInventoryRepository
+                                .findByStoreAndProductItem(
+                                        store,
+                                        productItem
+                                )
+                                .orElse(null);
+
+                if(inventory != null) {
+
+                    storeQuantity =
+                            inventory.getQuantity();
+
+                    availableInStore =
+                            inventory.getQuantity() > 0;
+                }
+            }
+
+            dto.setStoreQuantity(
+                    storeQuantity
+            );
+
+            dto.setAvailbleInStore(
+                    availableInStore
+            );
+
+            dto.setInStock(
+                    availableInStore
+            );
+
+            dto.setAvailableQty(
+                    storeQuantity
+            );
+
+            dto.setStockStatus(
+                    availableInStore
+                    ?
+                    "IN STOCK"
+                    :
+                    "OUT OF STOCK"
+            );
 
             result.add(dto);
         }
 
         return result;
     }
-
   
     public ProductItem getProductById(Long id)
     {
@@ -650,42 +674,68 @@ public class ProductItemService {
 
         dto.setImages(images);
 
-        List<String> compatibleVehicles = new ArrayList<>();
+        List<VehicleCompatibilityDTO>
+        compatibleVehicles =
+            new ArrayList<>();
 
-        List<ProductFitment> fitments = productFitmentRepository.findByProductItem_Id(productItem.getId());
+List<ProductFitment> fitments =
+        productFitmentRepository
+            .findByProductItem_Id(
+                productItem.getId()
+            );
 
-        for(ProductFitment fitment : fitments) {
+for(ProductFitment fitment : fitments)
+{
+    VehicleVariant variant =
+        fitment.getVehicleVariant();
 
-            VehicleVariant variant = fitment.getVehicleVariant();
+    if(variant == null)
+    {
+        continue;
+    }
 
-            if(variant == null) {
-                continue;
-            }
+    VehicleCompatibilityDTO vehicle =
+        new VehicleCompatibilityDTO();
 
-            if(variant.getVehicleGeneration() == null) {
-                continue;
-            }
+    vehicle.setMake(
+        variant
+            .getVehicleGeneration()
+            .getVehicleModel()
+            .getVehicleMake()
+            .getMakeName()
+    );
 
-            if(variant.getVehicleGeneration().getVehicleModel() == null) {
-                continue;
-            }
+    vehicle.setModel(
+        variant
+            .getVehicleGeneration()
+            .getVehicleModel()
+            .getModelName()
+    );
 
-            if(variant.getVehicleGeneration().getVehicleModel().getVehicleMake() == null) {
-                continue;
-            }
+    vehicle.setYear(
+       variant.getStartYear()
+    );
 
-            String vehicleName =
-                    variant.getVehicleGeneration().getVehicleModel().getVehicleMake().getMakeName()
-                    + " "
-                    + variant.getVehicleGeneration().getVehicleModel().getModelName()
-                    + " "
-                    + variant.getVariantName();
+    vehicle.setEngine(
+        variant.getEngineCode()
+    );
 
-            compatibleVehicles.add(vehicleName);
-        }
+    vehicle.setFuelType(
+        variant.getFuelType() 
+    );
 
-        dto.setCompatibleVehicles(compatibleVehicles);
+    vehicle.setEngineType(
+        variant.getVariantName()
+    );
 
+    compatibleVehicles.add(
+        vehicle
+    );
+}
+
+dto.setCompatibleVehicles(
+    compatibleVehicles
+);
         return dto;
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.DTO.ProductSearchResponseDTO;
+import com.DTO.TopVehicleDTO;
 import com.Entity.ProductFitment;
 
 @Repository
@@ -46,4 +47,20 @@ public interface ProductFitmentRepository extends JpaRepository<ProductFitment, 
         WHERE pf.vehicleVariant.id = :variantId
     """)
     List<ProductSearchResponseDTO> getProductsByVariant(Long variantId);
+    
+    @Query("""
+    		SELECT new com.DTO.TopVehicleDTO(
+    		    pf.vehicleVariant.fullName,
+    		    SUM(oi.quantity),
+    		    SUM(oi.totalPrice)
+    		)
+    		FROM OrderItem oi
+    		JOIN ProductFitment pf
+    		    ON pf.productItem.id = oi.productItem.id
+    		GROUP BY
+    		pf.vehicleVariant.fullName
+    		ORDER BY SUM(oi.quantity) DESC
+    		""")
+    		List<TopVehicleDTO>
+    		getTopSellingVehicles();
 }

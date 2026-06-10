@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.DTO.DeadStockDTO;
 import com.Entity.ProductItem;
 
 @Repository
@@ -31,5 +32,21 @@ public interface ProductItemRepository
     		OR LOWER(p.partMaster.category.categoryName) LIKE LOWER(CONCAT('%', :text, '%'))
     		""")
     		List<ProductItem> globalSearchProducts(@Param("text") String text);
+    @Query("""
+    		SELECT new com.DTO.DeadStockDTO(
+    		    p.itemName,
+    		    p.partNumber,
+    		    p.stockQuantity,
+    		    (p.stockQuantity * p.costPrice)
+    		)
+    		FROM ProductItem p
+    		WHERE p.id NOT IN :soldIds
+    		AND p.stockQuantity > 0
+    		ORDER BY p.stockQuantity DESC
+    		""")
+    		List<DeadStockDTO>
+    		getDeadStockProducts(
+    		    List<Long> soldIds
+    		);
 
 }

@@ -157,6 +157,28 @@ public class VehicleVariantService {
 
         return vehicleVariantRepository.findAll();
     }
+    public List<VehicleVariant>
+    getVariantsByYearMakeModel(
+            Integer year,
+            String make,
+            String model) {
+
+        if(year == null ||
+           make == null ||
+           make.trim().isBlank() ||
+           model == null ||
+           model.trim().isBlank()) {
+
+            return List.of();
+        }
+
+        return vehicleVariantRepository
+                .findVariantsByYearMakeModel(
+                        year,
+                        make.trim(),
+                        model.trim()
+                );
+    }
     
     
 }

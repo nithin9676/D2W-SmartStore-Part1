@@ -9,6 +9,7 @@ public class StoreResponse_Dto {
 	long quantity;
 	String stockstatus;
 	Long pincodeDifference;
+	private Integer minimumStock;
 	public StoreResponse_Dto() {
 		super();
 	}

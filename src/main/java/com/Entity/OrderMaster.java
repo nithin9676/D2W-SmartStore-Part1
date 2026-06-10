@@ -26,6 +26,13 @@ public class OrderMaster {
 
     private LocalDateTime orderDate =
         LocalDateTime.now();
+    @ManyToOne
+    @JoinColumn(name = "store_id")
+    private Store store;
+    
+    @ManyToOne
+    @JoinColumn(name="customer_id")
+    private Customer customer;
 
     public OrderMaster() {
     }
@@ -99,4 +106,37 @@ public class OrderMaster {
         this.orderDate =
             orderDate;
     }
+
+	public Store getStore() {
+		return store;
+	}
+
+	public void setStore(Store store) {
+		this.store = store;
+	}
+
+	public Customer getCustomer() {
+		return customer;
+	}
+
+	public void setCustomer(Customer customer) {
+		this.customer = customer;
+	}
+
+	public OrderMaster(Long id, String customerName, String phone, String address, String paymentMethod,
+			BigDecimal totalAmount, LocalDateTime orderDate, Store store, Customer customer) {
+		super();
+		this.id = id;
+		this.customerName = customerName;
+		this.phone = phone;
+		this.address = address;
+		this.paymentMethod = paymentMethod;
+		this.totalAmount = totalAmount;
+		this.orderDate = orderDate;
+		this.store = store;
+		this.customer = customer;
+	}
+
+	
+    
 }

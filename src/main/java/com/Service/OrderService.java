@@ -2,6 +2,7 @@ package com.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,12 +10,15 @@ import org.springframework.stereotype.Service;
 import com.DTO.InvoiceItemDTO;
 import com.DTO.InvoiceResponseDTO;
 import com.DTO.OrderItemDTO;
+import com.DTO.OrderListResponseDTO;
 import com.DTO.OrderRequestDTO;
+import com.Entity.Customer;
 import com.Entity.OrderItem;
 import com.Entity.OrderMaster;
 import com.Entity.ProductItem;
 import com.Entity.Store;
 import com.Entity.StoreInventory;
+import com.Repostory.CustomerRepository;
 import com.Repostory.OrderItemRepository;
 import com.Repostory.OrderMasterRepository;
 import com.Repostory.ProductItemRepository;
@@ -37,16 +41,43 @@ public class OrderService {
 
     @Autowired
     private StoreInventoryRepository storeInventoryRepository;
+    
+    
+    @Autowired
+    private CustomerRepository customerRepository;
 
     public Long placeOrder(OrderRequestDTO requestDTO) {
+    	
+    	if(
+    		    requestDTO.getItems() == null
+    		    ||
+    		    requestDTO.getItems().isEmpty()
+    		)
+    		{
+    		    throw new RuntimeException(
+    		        "Order must contain at least one item"
+    		    );
+    		}   
+    	Store store=storeRepository.findById(requestDTO.getStoreId()).orElseThrow();
 
+    	Customer customer=customerRepository.findByMobileNumber(requestDTO.getPhone()).orElse(null);
+    	if(customer==null)
+    	{
+    		customer=new Customer();
+    		customer.setCustomerName(requestDTO.getCustomerName());
+    		customer.setMobileNumber(requestDTO.getPhone());
+    		customer.setAddress(requestDTO.getAddress());
+    		customer=customerRepository.save(customer);
+    	}
         OrderMaster orderMaster = new OrderMaster();
-
+        orderMaster.setCustomer(customer);
         orderMaster.setCustomerName(requestDTO.getCustomerName());
         orderMaster.setPhone(requestDTO.getPhone());
         orderMaster.setAddress(requestDTO.getAddress());
         orderMaster.setPaymentMethod(requestDTO.getPaymentMethod());
         orderMaster.setTotalAmount(requestDTO.getTotalAmount());
+        orderMaster.setStore(store);
+        
         System.out.println(
         	    "NAME = " +
         	    requestDTO.getCustomerName()
@@ -62,12 +93,7 @@ public class OrderService {
         	    "STORE ID = " +
         	    requestDTO.getStoreId()
         	);
-        Store store =
-        	    storeRepository
-        	        .findById(
-        	            requestDTO.getStoreId()
-        	        )
-        	        .orElseThrow();
+        
         System.out.println(
         	    "SAVED NAME = " +
         	    savedOrder.getCustomerName()
@@ -121,7 +147,10 @@ public class OrderService {
             orderItem.setQuantity(itemDTO.getQuantity());
             orderItem.setSellingPrice(itemDTO.getSellingPrice());
             orderItem.setTotalPrice(itemDTO.getTotalPrice());
-
+            orderItem.setDiscountPercentage(itemDTO.getDiscountPercentage());
+            orderItem.setGstPercentage(itemDTO.getGstPercentage());
+            orderItem.setHsncode(product.getHsnCode());
+           
             orderItems.add(orderItem);
         }
 
@@ -132,6 +161,7 @@ public class OrderService {
     
     public InvoiceResponseDTO
     getInvoice(Long orderId) {
+    	
 
     OrderMaster orderMaster =
         orderMasterRepository
@@ -196,6 +226,10 @@ public class OrderService {
         dto.setTotalPrice(
             item.getTotalPrice()
         );
+        dto.setDiscountPercentage(item.getDiscountPercentage());
+        dto.setGstPercentage(item.getGstPercentage());
+        dto.setHsncode(item.getHsncode());
+        
 
         items.add(dto);
     }
@@ -204,4 +238,90 @@ public class OrderService {
 
     return response;
 }
+    public List<OrderListResponseDTO> getAllOrders() {
+
+        List<OrderMaster> orders =
+                orderMasterRepository.findAll();
+
+        List<OrderListResponseDTO> response =
+                new ArrayList<>();
+
+        for(OrderMaster order : orders) {
+
+            Integer itemCount =
+                    orderItemRepository
+                            .countByOrderMasterId(
+                                    order.getId()
+                            );
+
+            response.add(
+
+                new OrderListResponseDTO(
+
+                        order.getId(),
+
+                        order.getCustomerName(),
+
+                        order.getPhone(),
+
+                        order.getPaymentMethod(),
+
+                        order.getTotalAmount(),
+
+                        itemCount,
+
+                        order.getOrderDate()
+                )
+            );
+        }
+
+        return response;
+    }
+    public List<OrderListResponseDTO>
+    getOrdersByStore(
+        Long storeId
+    )
+    {
+        List<OrderMaster> orders =
+            orderMasterRepository
+                .findByStoreId(
+                    storeId
+                );
+
+        List<OrderListResponseDTO>
+            response =
+                new ArrayList<>();
+
+        for(OrderMaster order : orders)
+        {
+            Integer itemCount =
+                orderItemRepository
+                    .countByOrderMasterId(
+                        order.getId()
+                    );
+
+            response.add(
+
+                new OrderListResponseDTO(
+
+                    order.getId(),
+
+                    order.getCustomerName(),
+
+                    order.getPhone(),
+
+                    order.getPaymentMethod(),
+
+                    order.getTotalAmount(),
+
+                    itemCount,
+
+                    order.getOrderDate()
+                )
+            );
+        }
+
+        return response;
+    }
+    
 }

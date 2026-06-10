@@ -27,26 +27,13 @@ public class StoreInventoryService {
     @Autowired
     private ProductItemRepository productItemRepository;
 
-    public String addProductToStore(
-            StoreInventoryRequestDTO requestDTO) {
+    public String addProductToStore( StoreInventoryRequestDTO requestDTO) {
 
-        Store store =
-            storeRepository
-                .findById(requestDTO.getStoreId())
-                .orElseThrow();
+        Store store = storeRepository .findById(requestDTO.getStoreId()).orElseThrow();
 
-        ProductItem productItem =
-            productItemRepository
-                .findById(requestDTO.getProductId())
-                .orElseThrow();
+        ProductItem productItem =productItemRepository .findById(requestDTO.getProductId()) .orElseThrow();
 
-        StoreInventory existingInventory =
-            storeInventoryRepository
-                .findByStoreAndProductItem(
-                    store,
-                    productItem
-                )
-                .orElse(null);
+        StoreInventory existingInventory =storeInventoryRepository.findByStoreAndProductItem( store, productItem ).orElse(null);
 
         if(existingInventory != null)
         {
@@ -205,6 +192,12 @@ public class StoreInventoryService {
 
                 inventory.getQuantity() > 0
             );
+            responseDTO.setMinimumStock(
+            	    inventory.getMinimumStock()
+            	);
+            responseDTO.setGstPercentage(inventory.getProductItem().getGstPercentage());
+            responseDTO.setDiscountPercentage(inventory.getProductItem().getDiscountPercentage());
+            responseDTO.setHsncode(inventory.getProductItem().getHsnCode());
 
             responseList.add(responseDTO);
         }

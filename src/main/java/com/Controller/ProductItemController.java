@@ -58,9 +58,9 @@ public class ProductItemController {
     }
 
     @GetMapping("/search")
-    public List<ProductSearchResponseDTO> searchProducts(@RequestParam(value = "text", required = false) String text) {
+    public List<ProductSearchResponseDTO> searchProducts(@RequestParam(value = "text", required = false) String text,@RequestParam("storeId")Long storeId) {
 
-        return productItemService.getProductBySearchText(text);
+        return productItemService.getProductBySearchText(text,storeId);
     }
 
     @GetMapping("/{id}")

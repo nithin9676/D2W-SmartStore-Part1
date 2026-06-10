@@ -69,4 +69,19 @@ public interface VehicleVariantRepository extends JpaRepository<VehicleVariant, 
     
     Optional<VehicleVariant>
     findByFullName(String fullName);
+    @Query("""
+    	       SELECT v
+    	       FROM VehicleVariant v
+    	       WHERE v.startYear <= :year
+    	       AND (v.endYear IS NULL OR v.endYear >= :year)
+    	       AND LOWER(v.vehicleGeneration.vehicleModel.vehicleMake.makeName)=LOWER(:make)
+    	       AND LOWER(v.vehicleGeneration.vehicleModel.modelName)=LOWER(:model)
+    	       ORDER BY v.variantName
+    	       """)
+    	List<VehicleVariant> findVariantsByYearMakeModel(
+    	        @Param("year") Integer year,
+    	        @Param("make") String make,
+    	        @Param("model") String model);
+    
+    
 }

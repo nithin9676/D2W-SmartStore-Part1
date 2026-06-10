@@ -27,4 +27,6 @@ public class VehicleMakeController {
 
         return vehicleMakeService.getAllMakeDetails();
     }
+    
+    
 }

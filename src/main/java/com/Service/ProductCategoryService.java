@@ -18,7 +18,7 @@ public class ProductCategoryService {
     @Autowired
     private ProductCategoryRepository productCategoryRepository;
 
-    /* ================= INSERT CATEGORY ================= */
+   
 
     public String insertCategoryDetails(ProductCategory category) {
 

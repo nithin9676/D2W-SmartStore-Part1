@@ -1,10 +1,14 @@
 package com.Controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.DTO.InvoiceResponseDTO;
+import com.DTO.OrderListResponseDTO;
 import com.DTO.OrderRequestDTO;
+import com.Entity.OrderMaster;
 import com.Service.OrderService;
 
 @CrossOrigin(origins = "http://localhost:5173")
@@ -29,5 +33,22 @@ public class OrderController {
     public InvoiceResponseDTO getInvoice(  @PathVariable("orderId") Long orderId ) {
 
         return orderService .getInvoice(orderId);
+    }
+    @GetMapping
+    public List<OrderListResponseDTO> getAllOrders() {
+
+        return orderService.getAllOrders();
+    }
+    @GetMapping("/store/{storeId}")
+    public List<OrderListResponseDTO>
+    getOrdersByStore(
+        @PathVariable("storeId")
+        Long storeId
+    )
+    {
+        return orderService
+            .getOrdersByStore(
+                storeId
+            );
     }
 }

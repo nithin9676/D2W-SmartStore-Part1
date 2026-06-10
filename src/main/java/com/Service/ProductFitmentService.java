@@ -141,11 +141,7 @@ public class ProductFitmentService {
                     item.getStockQuantity() > 0
             );
 
-            /*
-            |--------------------------------------------------------------------------
-            | SAFE NULL CHECKS
-            |--------------------------------------------------------------------------
-            */
+        
 
             if(item.getPartBrand() != null)
             {

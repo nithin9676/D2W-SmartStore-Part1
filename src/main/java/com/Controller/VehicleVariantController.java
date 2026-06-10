@@ -17,11 +17,7 @@ public class VehicleVariantController {
     private VehicleVariantService
             vehicleVariantService;
 
-    /*
-    |--------------------------------------------------------------------------
-    | INSERT VARIANT
-    |--------------------------------------------------------------------------
-    */
+   
 
     @PostMapping
     public String insertVehicleVariant(
@@ -34,11 +30,7 @@ public class VehicleVariantController {
                 );
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | GET VARIANTS BY GENERATION
-    |--------------------------------------------------------------------------
-    */
+   
 
     @GetMapping("/by-generation/{generationId}")
     public List<VehicleVariant>
@@ -52,11 +44,7 @@ public class VehicleVariantController {
                 );
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | GET ALL VARIANTS
-    |--------------------------------------------------------------------------
-    */
+    
 
     @GetMapping
     public List<VehicleVariant>
@@ -65,4 +53,34 @@ public class VehicleVariantController {
         return vehicleVariantService
                 .getAllVariants();
     }
+    @GetMapping("/years")
+    public List<Integer> getAllAvailableYears() {
+
+        return vehicleVariantService
+                .getAllAvailableYears();
+    }
+    @GetMapping("/makes/{year}")
+    public List<String> getMakesByYear(
+            @PathVariable("year") Integer year) {
+
+        return vehicleVariantService
+                .getMakesByYear(year);
+    }
+    @GetMapping("/models")
+    public List<String> getModelsByYearAndMake( @RequestParam("year") Integer year, @RequestParam("make") String make) {
+
+        return vehicleVariantService.getModelsByYearAndMake( year, make );
+    }
+    @GetMapping("/variants")
+    public List<VehicleVariant>
+    getVariantsByYearMakeModel( @RequestParam("year") Integer year, @RequestParam("make") String make, @RequestParam("model") String model) {
+
+        return vehicleVariantService
+                .getVariantsByYearMakeModel(
+                        year,
+                        make,
+                        model
+                );
+    }
+    
 }
